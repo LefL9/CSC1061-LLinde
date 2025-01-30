@@ -5,8 +5,8 @@ public class CarDriver {
 		
 		Car myCar = new Car(); 
 		System.out.println(myCar.toString());
-		
 		Car ocar = new Car("Pink", 50, 100.0,true);
+		
 		ocar.setWheels(15, "Alloy");
 		int currVol = 0;
 		Radio rad = ocar.getRadio();
@@ -17,8 +17,13 @@ public class CarDriver {
 		myCar.drive(5);
 		
 		myCar.clean();
+		System.out.println(ocar);
 		
-
+		
+		
+		Carwash cwash = new Carwash();
+		cwash.cleanCar(ocar);
+		System.out.println(ocar);
 	}
 
 }
