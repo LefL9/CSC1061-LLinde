@@ -49,7 +49,7 @@ public void setSocialSecurityNumber(String socialSecurityNumber) {
 
 @Override
 public String toString() {
-	return "firstName= " + firstName + "\nlastName= " + lastName + "\nsocialSecurityNumber="
+	return "firstName= " + firstName + "\nlastName= " + lastName + "\nsocialSecurityNumber= "
 			+ socialSecurityNumber;
 }
 

@@ -1,10 +1,10 @@
 
-public class ComissionEmployee extends Employee {
+public class CommissionEmployee extends Employee {
 private double grossSales;
 private double commissionRate;
 
 
-public ComissionEmployee(String firstName, String lastName, String socialSecurityNumber, double grossSales, double commissionRate) {
+public CommissionEmployee(String firstName, String lastName, String socialSecurityNumber, double grossSales, double commissionRate) {
 	super(firstName, lastName, socialSecurityNumber);
 	this.grossSales = grossSales;
 	this.commissionRate = commissionRate;
@@ -33,14 +33,14 @@ public void setCommissionRate(double commissionRate) {
 
 @Override
 public double getPaymentAmount() {
-	return super.getPaymentAmount();
+	return grossSales*commissionRate;
 }
 
 
 @Override
 public String toString() {
-	return "grossSales= " + grossSales + "\ncommissionRate= " + commissionRate + "\n"
-			+ super.toString();
+	return "grossSales= " + grossSales + "\ncommissionRate= " + commissionRate + "\n" + 
+"Payment amount= " + getPaymentAmount() +"\n"+ super.toString();
 }
 
 

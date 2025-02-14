@@ -21,13 +21,13 @@ public void setWeeklySalary(double weeklySalary) {
 
 @Override
 public double getPaymentAmount() {
-	return super.getPaymentAmount();
+	return weeklySalary;
 }
 
 
 @Override
 public String toString() {
-	return "weeklySalary= " + weeklySalary  + "\n" + super.toString();
+	return "weeklySalary= " + weeklySalary  + "\nPayment amount= " + getPaymentAmount() + "\n" + super.toString();
 }
 
 
