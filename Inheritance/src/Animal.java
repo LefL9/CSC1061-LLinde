@@ -1,5 +1,5 @@
-
-public class Animal {
+//abstract class: can't ever create new animal
+public abstract class Animal {
 private String gender;
 private int age;
 private double weight;
@@ -17,8 +17,9 @@ public Animal(String gender, int age, double weight, String color) {
 public String toString() {
 	return "Animal [gender=" + gender + ", age=" + age + ", weight=" + weight + ", color=" + color + "]";
 }
-public String makeSound(){
-	return "blah blah";
-}
+//abstract method doesn't even have a body, forces other animals to all have their own 
+//make sound methods
+
+public abstract String makeSound();
 
 }
