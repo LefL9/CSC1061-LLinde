@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"<Unnamed>","c":"Converter","l":"CM_PER_INCH"},{"p":"<Unnamed>","c":"Converter","l":"Converter()","u":"%3Cinit%3E()"},{"p":"<Unnamed>","c":"Converter","l":"toCentimeters(int, int)","u":"toCentimeters(int,int)"},{"p":"<Unnamed>","c":"Converter","l":"toInches(double)"}];updateSearchResults();

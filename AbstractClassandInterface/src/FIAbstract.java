@@ -1,5 +1,5 @@
 
-public abstract class FIAbstract implements Comparable<FIAbstract> {
+public abstract class FIAbstract implements Comparable<FIAbstract>, Cloneable {
  private String FIName;
  private long fiID;
  private long routingNumber;
@@ -53,6 +53,12 @@ public int compareTo(FIAbstract fi) {
 	return 0;
 }
 
+@Override
+public FIAbstract clone() throws CloneNotSupportedException {
+	FIAbstract clone = (FIAbstract) super.clone();
+	clone.address = address.clone();
+	return clone;
+}
 
 @Override
 public String toString() {
