@@ -26,4 +26,12 @@ public class Faculty extends Employee {
 		this.rank = rank;
 	}
 
+	@Override
+	public String toString() {
+		return "Faculty [officeHours=" + officeHours + ", rank=" + rank + ", getOffice()=" + getOffice()
+				+ ", getSalary()=" + getSalary() + ", getDateHired()=" + getDateHired() + ", getName()=" + getName()
+				+ ", getAddress()=" + getAddress() + ", getPhoneNumber()=" + getPhoneNumber() + ", getEmailAddress()="
+				+ getEmailAddress() + "]";
+	}
+
 }

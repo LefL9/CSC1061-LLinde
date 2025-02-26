@@ -36,4 +36,11 @@ public class Employee extends Person {
 		this.dateHired = dateHired;
 	}
 
+	@Override
+	public String toString() {
+		return "Employee [office=" + office + ", salary=" + salary + ", dateHired=" + dateHired + ", getName()="
+				+ getName() + ", getAddress()=" + getAddress() + ", getPhoneNumber()=" + getPhoneNumber()
+				+ ", getEmailAddress()=" + getEmailAddress() + "]";
+	}
+
 }

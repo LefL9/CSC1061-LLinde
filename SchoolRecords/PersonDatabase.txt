@@ -1,0 +1,6 @@
+Class: class Staff
+Name: Robert Wilson
+Address: 34 Cedar Lane
+Phone: 555-1212
+Email: robert.w@school.com
+
