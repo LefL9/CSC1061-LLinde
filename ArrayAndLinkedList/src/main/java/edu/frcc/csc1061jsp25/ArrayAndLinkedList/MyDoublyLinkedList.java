@@ -5,14 +5,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class MyLinkedList<E> implements List<E> {
+public class MyDoublyLinkedList<E> implements List<E> {
 
 	private Node head;
+	private Node tail;
 	private int size;
+	
 
 	private class Node {
 		E data;
 		Node next;
+		Node prev;
 
 		public Node(E data) {
 			this.data = data;
@@ -20,9 +23,10 @@ public class MyLinkedList<E> implements List<E> {
 		}
 	}
 
-	public MyLinkedList() {
+	public MyDoublyLinkedList() {
 		head = null;
 		size = 0;
+		tail = null;
 	}
 
 	@Override
@@ -38,12 +42,14 @@ public class MyLinkedList<E> implements List<E> {
 	@Override
 	public boolean isEmpty() {
 		// if(head == null) <- asking, if yes return value
-		return head == null;
+		return size == 0;
 	}
 
 	@Override
 	public boolean contains(Object o) {
-		// TODO Auto-generated method stub
+		if(indexOf(o) != -1) {
+			return true;
+		}
 		return false;
 	}
 
@@ -55,8 +61,13 @@ public class MyLinkedList<E> implements List<E> {
 
 	@Override
 	public Object[] toArray() {
-		// TODO Auto-generated method stub
-		return null;
+		Object[] array = new Object[size];
+		int i = 0;
+		for (Node node = head; node != null; node = node.next) {
+			array[i++] = node.data;
+			//i++ means incrementing AFTER, ++i increments before
+		}
+		return array;
 	}
 
 	@Override
@@ -71,19 +82,22 @@ public class MyLinkedList<E> implements List<E> {
 		if (head == null) {
 			head = newNode;
 		} else {
-			Node node = null;
-			for (node = head; node.next != null; node = node.next) {
-			}
-			node.next = newNode;
+			tail.next = newNode;
+			newNode.prev = tail;
 		}
+		tail = newNode;
 		size++;
 		return true;
 	}
 
 	@Override
 	public boolean remove(Object o) {
-		// TODO Auto-generated method stub
-		return false;
+		int index = indexOf(o); 
+		if(index == -1) {
+			return false;
+		}
+		remove(index);
+		return true;
 	}
 
 	@Override
@@ -119,6 +133,7 @@ public class MyLinkedList<E> implements List<E> {
 	@Override
 	public void clear() {
 		head = null;
+		tail = null;
 		size = 0;
 	}
 
@@ -198,8 +213,16 @@ public class MyLinkedList<E> implements List<E> {
 
 	@Override
 	public int lastIndexOf(Object o) {
-		// TODO Auto-generated method stub
-		return 0;
+		int index = size -1;
+		int foundIndex = -1;
+		for (Node node = tail; node != null; node = node.prev) {
+			if (o.equals(node.data)) {
+				foundIndex = index;
+				break;
+			}
+			index++;
+		}
+		return foundIndex;
 	}
 
 	@Override
