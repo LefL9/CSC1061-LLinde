@@ -1,6 +1,7 @@
-package edu.frcc.csc1061jsp25.MyTreeMap;
+package edu.frcc.csc1061jsp25.MyAVLTree;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,19 +10,22 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-public class MyTreeMap<K, V> implements Map<K, V>, Iterable<K>{
+public class MyAVLTree1<K, V> implements Map<K, V>, Iterable<edu.frcc.csc1061jsp25.MyAVLTree.MyAVLTree.Node> {
 	private Node root = null;
 	private int size = 0;
+	private List<Node> path = new ArrayList<>() ;
 
-	private class Node {
+	protected class Node {
 		private K key;
 		private V value;
 		private Node left;
 		private Node right;
+		private int height;
 
 		public Node(K key, V value) {
 			this.key = key;
 			this.value = value;
+			height = 0;
 		}
 	}
 
@@ -30,8 +34,6 @@ public class MyTreeMap<K, V> implements Map<K, V>, Iterable<K>{
 		return size;
 	}
 
-	
-	
 	@Override
 	public boolean isEmpty() {
 		return size == 0;
@@ -54,9 +56,11 @@ public class MyTreeMap<K, V> implements Map<K, V>, Iterable<K>{
 	@Override
 	public V get(Object key) {
 		Node current = root;
+		path.clear();
 		Comparable<K> k = (Comparable<K>) key;
 
 		while (current != null) {
+			path.add(current);
 			if (k.compareTo(current.key) < 0) {
 				current = current.left;
 			} else if (k.compareTo(current.key) > 0) {
@@ -73,6 +77,7 @@ public class MyTreeMap<K, V> implements Map<K, V>, Iterable<K>{
 		if (root == null) {
 			Node newNode = new Node(key, value);
 			root = newNode;
+			updateHeight(newNode);
 			size++;
 			return null;
 		}
@@ -100,106 +105,142 @@ public class MyTreeMap<K, V> implements Map<K, V>, Iterable<K>{
 		} else {
 			parent.right = newNode;
 		}
-
+		updateHeight(newNode);
+		balancePath();
 		size++;
 		return null;
 	}
+
+	private void updateHeight(Node node) {
+		if (node.left == null && node.right == null) {
+			node.height = 0;
+		} else if (node.left == null) {
+			node.height = node.right.height + 1;
+		} else if (node.right == null) {
+			node.height = node.left.height + 1;
+		} else {
+			node.height = Math.max(node.left.height, node.right.height) + 1;
+		}
+	}
+	
+	private int balanceFactor(Node current) {
+		int balanceFactor = 0;
+
+		if (current.left == null) {
+			balanceFactor = current.height;
+		} else if (current.right == null) {
+			balanceFactor = -current.height;
+		} else {
+			balanceFactor = current.right.height - current.left.height;
+		}
+
+		return balanceFactor;
+	}
+	
+	private void balancePath() {
+		for(int i = path.size() - 1; i >= 0; i--) {
+			Node current = path.get(i);
+			updateHeight(current);
+			Node parent = null;
+			if(i>0) {
+				parent = path.get(i-1);
+			}
+			switch(balanceFactor(current)) {
+			case -2:
+				if(balanceFactor(current.left) <= 0) {
+					//LL imbalance
+					balanceLL(current,parent);
+				}
+				else {
+					// LR imbalance
+					balanceLR(current,parent);
+				}
+				break;
+			case 2:
+				if(balanceFactor(current.right) >= 0) {
+					//RR imbalance
+					balanceRR(current,parent);
+				}
+				else {
+					// RL imbalance
+				}
+				break;
+			}
+		}
+	}
+	
+	private void balanceLL(Node node, Node parent) {
+		Node ggp = parent;
+		Node gp = node;
+		Node par = gp.left;
+		Node ch = par.left;
+		
+		if(gp == root) {
+			root = par;
+		}
+		if(ggp.right == gp) {
+			ggp.right = par;
+		}
+		else {
+			ggp.left = par;
+		}
+		gp.left = par.right;
+		par.right = gp;
+		
+		updateHeight(gp);
+		updateHeight(ch);
+		updateHeight(par);
+	}
+	
+	private void balanceRR(Node node, Node parent) {
+		
+	}
+	
+	private void balanceLR(Node node, Node parent) {
+		Node ggp = parent;
+		Node gp = node;
+		Node par = gp.left;
+		Node ch = par.right;
+		
+		if(gp == root) {
+			root = ch;
+		}
+		else {
+			if(ggp.left == par) {
+				ggp.left = ch;
+			}
+			else {
+				ggp.right = ch;
+			}
+		}
+		par.right = ch.left;
+		gp.left = ch.right;
+		
+		ch.left = par;
+		ch.right = gp;
+		
+		updateHeight(gp);
+		updateHeight(par);
+		updateHeight(ch);
+	}
+
 //Homework
 	@Override
 	public V remove(Object key) {
-		if (root == null)
-			return null;
-
-		Comparable<K> k = (Comparable<K>) key;
-		Node current = root;
-		Node parent = null;
-
-		while (current != null) {
-			int cmp = k.compareTo(current.key);
-
-			if (cmp < 0) {
-				parent = current;
-				current = current.left;
-			} else if (cmp > 0) {
-				parent = current;
-				current = current.right;
-			} else {
-				// Found the node to delete
-				V oldValue = current.value;
-
-				// No children
-				if (current.left == null && current.right == null) {
-					if (parent == null) {
-						root = null;
-					} else if (parent.left == current) {
-						parent.left = null;
-					} else {
-						parent.right = null;
-					}
-				}
-
-				// Only right child
-				else if (current.left == null) {
-					if (parent == null) {
-						root = current.right;
-					} else if (parent.left == current) {
-						parent.left = current.right;
-					} else {
-						parent.right = current.right;
-					}
-				}
-
-				// Only left child
-				else if (current.right == null) {
-					if (parent == null) {
-						root = current.left;
-					} else if (parent.left == current) {
-						parent.left = current.left;
-					} else {
-						parent.right = current.left;
-					}
-				}
-
-				// Two children
-				else {
-					// Find in-order successor
-					Node successorParent = current;
-					Node successor = current.right;
-					while (successor.left != null) {
-						successorParent = successor;
-						successor = successor.left;
-					}
-
-					// Replace current node's key and value with successor's
-					current.key = successor.key;
-					current.value = successor.value;
-
-					// Delete the successor node
-					if (successorParent.left == successor) {
-						successorParent.left = successor.right;
-					} else {
-						successorParent.right = successor.right;
-					}
-				}
-
-				size--;
-				return oldValue;
-			}
-		}
-
-		return null; // key not found
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public void putAll(Map<? extends K, ? extends V> m) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void clear() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -220,30 +261,28 @@ public class MyTreeMap<K, V> implements Map<K, V>, Iterable<K>{
 		return null;
 	}
 
-
-
 	@Override
-	public Iterator<K> iterator() {
-		
-		return new RecursiveIterator();
+	public Iterator iterator() {
+
+		return new nonRecursiveIterator();
 	}
-	
-	private class RecursiveIterator implements Iterator<K>{
-		private Queue<K> list = new ArrayDeque<>();
-		
-		public RecursiveIterator() {
+
+	private class nonRecursiveIterator implements Iterator<Node> {
+		private Queue<Node> list = new ArrayDeque<>();
+
+		public nonRecursiveIterator() {
 			preorder(root);
 		}
-		
+
 		private void preorder(Node node) {
 			if (node == null) {
 				return;
 			}
-			list.add(node.key);
+			list.add(node.value);
 			preorder(node.left);
 			preorder(node.right);
 		}
-		
+
 		private void postorder(Node node) {
 			if (node == null) {
 				return;
@@ -252,6 +291,7 @@ public class MyTreeMap<K, V> implements Map<K, V>, Iterable<K>{
 			postorder(node.right);
 			list.add(node.key);
 		}
+
 		private void inorder(Node node) {
 			if (node == null) {
 				return;
@@ -261,16 +301,6 @@ public class MyTreeMap<K, V> implements Map<K, V>, Iterable<K>{
 			inorder(node.right);
 		}
 
-		@Override
-		public boolean hasNext() {
-			  return !list.isEmpty();
-		}
-
-		@Override
-		public K next() {
-			 return list.poll();
-		}
-		
 	}
 
 }
