@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import edu.frcc.csc1061jfa24.MyAVLTree.MyAVLTree;
-import edu.frcc.csc1061jfa24.MyAVLTree.MyAVLTree.Node;
+import edu.frcc.csc1061jsp25.MyAVLTree.MyAVLTree;
+import edu.frcc.csc1061jsp25.MyAVLTree.MyAVLTree.Node;
 
 
 public class MyAVLTreeTest {
@@ -48,7 +48,7 @@ public class MyAVLTreeTest {
 	}
 
 	private static void printInOrder(MyAVLTree<Integer, Integer> map) {
-		for(Node node: map) {
+		for(MyAVLTree<Integer, Integer>.Node node: map) {
 			System.out.print(node.getKey().toString() + " ");
 		}
 		System.out.println();
@@ -56,7 +56,7 @@ public class MyAVLTreeTest {
 	
 	private static void printBalanceFactor(MyAVLTree<Integer, Integer> map) {
 		int minHeight = 1;
-		for(Node node: map) {
+		for(MyAVLTree<Integer, Integer>.Node node: map) {
 			if (node.getHeight() == 0) {
 				minHeight = 0;
 				break;
@@ -64,7 +64,7 @@ public class MyAVLTreeTest {
 		}
 		
 		System.out.println("\nNode\tHeight\tBalance Factor\tLeftChild\tRightChild");
-		for(Node node: map) {
+		for(MyAVLTree<Integer, Integer>.Node node: map) {
 			if (minHeight == 1) {
 				System.out.println(node.getKey().toString() + "\t" + node.getHeight() + "\t"
 					+ ((node.getRight() != null ? node.getRight().getHeight() : 0) 

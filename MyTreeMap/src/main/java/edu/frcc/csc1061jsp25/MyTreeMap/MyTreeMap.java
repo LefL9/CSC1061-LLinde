@@ -232,7 +232,7 @@ public class MyTreeMap<K, V> implements Map<K, V>, Iterable<K>{
 		private Queue<K> list = new ArrayDeque<>();
 		
 		public RecursiveIterator() {
-			preorder(root);
+			inorder(root);
 		}
 		
 		private void preorder(Node node) {

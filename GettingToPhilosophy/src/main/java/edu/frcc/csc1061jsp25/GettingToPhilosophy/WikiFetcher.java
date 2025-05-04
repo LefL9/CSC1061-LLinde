@@ -93,4 +93,8 @@ public class WikiFetcher {
 			System.out.println(paragraph);
 		}
 	}
+	public Document fetchWikipediaDocument(String url) throws IOException {
+	    sleepIfNeeded();
+	    return Jsoup.connect(url).get();
+	}
 }

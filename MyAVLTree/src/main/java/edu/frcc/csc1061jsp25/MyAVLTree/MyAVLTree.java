@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MyAVLTree<K,V> implements Map<K,V>, Iterable<edu.frcc.sp25.CSC1061.MyAVLTree.MyAVLTree.Node>{
+public class MyAVLTree<K,V> implements Map<K,V>, Iterable<MyAVLTree<K, V>.Node>{
 	
 	private Node root = null;
 	private int size = 0;
@@ -88,22 +88,19 @@ public class MyAVLTree<K,V> implements Map<K,V>, Iterable<edu.frcc.sp25.CSC1061.
 
 	@Override
 	public boolean containsKey(Object key) {
-		
-		Node current = root;
-		Comparable<K> k = (Comparable<K>) key;
-		
-		while(current != null) {
-			if(k.compareTo(current.key) > 0) {
-				current = current.left;
-			}
-			else if(k.compareTo(current.key) < 0) {
-				current = current.right;
-			}	
-			else {
-				return true;
-			}
-		}
-		return false;
+	    Node current = root;
+	    Comparable<K> k = (Comparable<K>) key;
+
+	    while (current != null) {
+	        if (k.compareTo(current.key) < 0) {
+	            current = current.left;
+	        } else if (k.compareTo(current.key) > 0) {
+	            current = current.right;
+	        } else {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 
 	@Override
@@ -135,89 +132,56 @@ public class MyAVLTree<K,V> implements Map<K,V>, Iterable<edu.frcc.sp25.CSC1061.
 
 	@Override
 	public V put(K key, V value) {
-		
-		if(root == null) {
-			Node newNode = new Node(key, value);
-			root = newNode;
-			size++;
-			updateHeight(root);
-			return null;
-		}
-		
-		Node parent = null;
-		Node current = root;
-		path.clear();
-		
-		
-		Comparable<K> k = (Comparable<K>) key;
-		
-		while(current != null) {
-			path.add(current);
-			if(k.compareTo(current.key) < 0) {
-				parent = current;
-				current = current.left;	
-			}
-			else if(k.compareTo(current.key) > 0) {
-				parent = current;
-				current = current.right;	
-			}
-			else {
-				V oldVal = current.value;
-				current.value = value;
-				return oldVal;
-			}
-		}
-		
-		Node newNode = new Node(key, value);
-		if(k.compareTo(parent.key) < 0 ) {
-			parent.left = newNode;
-			
-		} else {
-			parent.right = newNode;
-		}
-		
-		updateHeight(newNode);
-		balancePath();
-		size++;
-		return null;
-		
+	    if (root == null) {
+	        root = new Node(key, value);
+	        size++;
+	        return null;
+	    }
+
+	    Node parent = null;
+	    Node current = root;
+	    path.clear();
+
+	    Comparable<K> k = (Comparable<K>) key;
+
+	    while (current != null) {
+	        path.add(current);
+	        if (k.compareTo(current.key) < 0) {
+	            parent = current;
+	            current = current.left;
+	        } else if (k.compareTo(current.key) > 0) {
+	            parent = current;
+	            current = current.right;
+	        } else {
+	            V oldVal = current.value;
+	            current.value = value;
+	            return oldVal;
+	        }
+	    }
+
+	    Node newNode = new Node(key, value);
+	    if (k.compareTo(parent.key) < 0) {
+	        parent.left = newNode;
+	    } else {
+	        parent.right = newNode;
+	    }
+
+	    path.add(newNode);  // Add to path for balancing
+	    balancePath();
+	    size++;
+	    return null;
 	}
 	
 	private void updateHeight(Node node) {
-		
-		if(node.left == null && node.right == null) {
-			node.height = 0;	
-		}
-		else if(node.left == null) {
-			node.height = node.right.height + 1;
-		}
-		else if(node.right == null) {
-			node.height = node.left.height + 1;
-		}
-		else {
-		node.height = Math.max(node.left.height, node.right.height) + 1;
-		}
-		
+	    int leftHeight = node.left != null ? node.left.height : -1;
+	    int rightHeight = node.right != null ? node.right.height : -1;
+	    node.height = Math.max(leftHeight, rightHeight) + 1;
 	}
 	
-	private int balanceFactor(Node current) {
-		
-		int balanceFactor = 0;
-		
-	
-		if(current.left == null) {
-			balanceFactor = current.height;
-			
-		}
-		else if(current.right == null) {
-			balanceFactor = -current .height;
-		}
-		else {
-			balanceFactor = current.right.height - current.left.height;
-		}
-		
-		return balanceFactor;	
-		
+	private int balanceFactor(Node node) {
+	    int leftHeight = node.left != null ? node.left.height : -1;
+	    int rightHeight = node.right != null ? node.right.height : -1;
+	    return rightHeight - leftHeight;
 	}
 	
 	private void balancePath() {
@@ -242,13 +206,11 @@ public class MyAVLTree<K,V> implements Map<K,V>, Iterable<edu.frcc.sp25.CSC1061.
 			case 2:
 				if(balanceFactor(current.right) >= 0) {
 					//RR imbalance
-					//homework
-					//balanceRR(current,parent);
+					balanceRR(current,parent);
 				}
 				else {
 					//RL imbalance
-					//homework
-					//balanceRL(current, parent);
+					balanceRL(current, parent);
 				}
 				break;
 				
@@ -256,77 +218,94 @@ public class MyAVLTree<K,V> implements Map<K,V>, Iterable<edu.frcc.sp25.CSC1061.
 		}
 	}
 	
-	private void balanceLL(Node node, Node parent) {
-		
-		Node ggp = parent;
-		Node gp = node;
-		Node par = gp.left;
-		Node ch = par.left;
-		
-		if(gp == root) {
-			root = par;
-		}
-		
-		else {
-		
-			if(ggp.right == gp) {
-				ggp.right = par;	
-			}
-			else {
-			ggp.left = par;
-		}
-			
-		gp.left = par.right;
-		par.right = gp;	
-		
-		updateHeight(gp);
-		updateHeight(ch);
-		updateHeight(par);
-		
-		
-	}
+	private void balanceLL(Node gp, Node parent) {
+	    Node par = gp.left;
+	    gp.left = par.right;
+	    par.right = gp;
+
+	    if (gp == root) {
+	        root = par;
+	    } else if (parent.left == gp) {
+	        parent.left = par;
+	    } else {
+	        parent.right = par;
+	    }
+
+	    updateHeight(gp);
+	    updateHeight(par);
 	}
 	
 	
 	private void balanceRR(Node node, Node parent) {
-		//homework
-		
+	    Node gp = node;       // grandparent (unbalanced node)
+	    Node par = gp.right;  // parent of unbalanced node (right-heavy)
+	    
+	    if (gp == root) {
+	        root = par;
+	    } else {
+	        if (parent.left == gp) {
+	            parent.left = par;
+	        } else {
+	            parent.right = par;
+	        }
+	    }
+
+	    gp.right = par.left;
+	    par.left = gp;
+
+	    updateHeight(gp);
+	    updateHeight(par);
 	}
 	
-	private void balanceLR(Node node, Node parent) {
-		Node ggp = parent;
-		Node gp = node;
-		Node par = gp.left;
-		Node ch = par.right;
-		
-		if(gp == root) {
-			root = ch;
-		}
-		else {
-			if(ggp.left == par) {
-				ggp.left = ch;
-			}
-			else {
-				ggp.right = ch;
-			}
-		}
-		
-		par.right = ch.left;
-		gp.left = ch.right;
-		
-		ch.left = par;
-		ch.right = gp;
-		
-		updateHeight(gp);
-		updateHeight(par);
-		updateHeight(ch);
-		
+	private void balanceLR(Node gp, Node parent) {
+	    Node par = gp.left;
+	    Node ch = par.right;
+	   
+	    par.right = ch.left;
+	    gp.left = ch.right;
+
+	    ch.left = par;
+	    ch.right = gp;
+
+	    if (gp == root) {
+	        root = ch;
+	    } else if (parent.left == gp) {
+	        parent.left = ch;
+	    } else {
+	        parent.right = ch;
+	    }
+
+	    updateHeight(par);
+	    updateHeight(gp);
+	    updateHeight(ch);
 	}
 	
 	private void balanceRL(Node node, Node parent) {
-		//homework
+	    Node gp = node;
+	    Node par = gp.right;
+	    Node ch = par.left;
+
+	    if (gp == root) {
+	        root = ch;
+	    } else {
+	        if (parent.left == gp) {
+	            parent.left = ch;
+	        } else {
+	            parent.right = ch;
+	        }
+	    }
+
+	    par.left = ch.right;
+	    gp.right = ch.left;
+
+	    ch.right = par;
+	    ch.left = gp;
+
+	    updateHeight(gp);
+	    updateHeight(par);
+	    updateHeight(ch);
 	}
-	//Homework
+
 
 	@Override
 	public V remove(Object key) {

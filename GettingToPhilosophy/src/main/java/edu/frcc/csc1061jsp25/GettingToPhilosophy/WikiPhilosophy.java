@@ -3,7 +3,6 @@ package edu.frcc.csc1061jsp25.GettingToPhilosophy;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
+
 
 public class WikiPhilosophy {
 
@@ -45,40 +45,87 @@ public class WikiPhilosophy {
      * @throws IOException
      */
     public static void testConjecture(String destination, String source, int limit) throws IOException {
-        Document doc = null;
-        Connection conn = Jsoup.connect(source);
-        try 
-        {
-            doc = conn.get();
-        }
-        catch (Exception e)
-        {
-            System.out.println("Could not open page. Exiting...");
-            e.printStackTrace();
-            System.exit(-1);
+        if (limit <= 0) {
+            System.out.println("Step limit exceeded.");
+            return;
         }
 
-        // select the content text and pull out the paragraphs.
+        if (visited.contains(source)) {
+            System.out.println("Loop detected. Already visited: " + source);
+            return;
+        }
+
+        System.out.println("Visiting: " + source);
+        visited.add(source);
+
+        if (source.equals(destination)) {
+            System.out.println("Reached destination!");
+            return;
+        }
+
+        Document doc;
+        try {
+        	doc = wf.fetchWikipediaDocument(source);
+        } catch (Exception e) {
+            System.out.println("Error fetching page.");
+            return;
+        }
+
         Element content = doc.getElementById("mw-content-text");
         Elements paragraphs = content.select("p");
+
+        int parenDepth = 0;
 
         for (Element para : paragraphs) {
             Iterable<Node> iter = new WikiNodeIterable(para);
             for (Node node : iter) {
+                if (node instanceof TextNode) {
+                    String text = ((TextNode) node).text();
+                    for (char c : text.toCharArray()) {
+                        if (c == '(') parenDepth++;
+                        if (c == ')' && parenDepth > 0) parenDepth--;
+                    }
+                }
 
-				// TODO: FILL THIS IN!
-				// If this node is a text node make sure you are not within parentheses
-				if (node instanceof TextNode) {
+                if (node instanceof Element) {
+                    Element el = (Element) node;
 
-				}
-            	// If this node has a link you can get it by accessing the href attribute in the node
-            	String link = node.attr("href");
-            	// If the link is not null and not an empty string and does not start with a # sign 
-            	
-            	// and is not within parentheses, follow the link recursively by calling testConjecture() 
-            	// until you reach your objective or run past the limit. 
+                    if (el.tagName().equals("a")) {
+                        if (parenDepth > 0 || isItalic(el) || isRedLink(el)) continue;
+
+                        String relHref = el.attr("href");
+                        if (relHref.startsWith("/wiki/") && !relHref.contains(":") && !relHref.contains("#")) {
+                            String absUrl = "https://en.wikipedia.org" + relHref;
+
+                            
+                            testConjecture(destination, absUrl, limit - 1);
+                            return;
+                        }
+                    }
+                }
             }
-
         }
+
+        System.out.println("No valid links found on this page.");
+    }
+
+    /**
+     * Checks if the given element or any of its parents are italicized.
+     */
+    private static boolean isItalic(Element el) {
+        for (Element parent = el; parent != null; parent = parent.parent()) {
+            String tag = parent.tagName();
+            if (tag.equals("i") || tag.equals("em")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the given element is a red link (nonexistent page).
+     */
+    private static boolean isRedLink(Element el) {
+        return el.classNames().contains("new");
     }
 }
