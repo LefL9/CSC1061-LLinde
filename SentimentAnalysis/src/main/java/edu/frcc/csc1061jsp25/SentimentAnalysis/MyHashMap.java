@@ -1,4 +1,4 @@
-package edu.frcc.csc1061jsp25.MyHashMap;
+package edu.frcc.csc1061jsp25.SentimentAnalysis;
 
 import java.util.Collection;
 import java.util.LinkedList;
